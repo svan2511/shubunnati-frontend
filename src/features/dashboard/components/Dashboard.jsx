@@ -14,6 +14,7 @@ import {
 import { fetchAllUsers, fetchUserLogout } from "../../users/userSlice";
 import MySwal from "../../../utils/alert";
 import { useEffect } from "react";
+import { fetchAllCenters } from "../../centers/centerSlice";
 
 export default function Dashboard() {
   const dispatch = useDispatch();
@@ -21,16 +22,18 @@ export default function Dashboard() {
   const userText = useSelector(
     (state) => state.loggedUser.fetchingTextUser
   );
+  const totalCenters = useSelector((state) => state.center.totalRecords);
 
   useEffect(() => {
     dispatch(fetchAllUsers({ token, page: 1 }));
+    dispatch(fetchAllCenters({ token, page: 1 }));
   }, []);
 
    /* ---------- Static KPI Data ---------- */
   const stats = [
     { title: "Total Users", value: userText },
     { title: "Total Members", value: 980 },
-    { title: "Total Centers", value: 64 },
+    { title: "Total Centers", value: totalCenters },
   ];
 
   /* ---------- Dummy Chart Data ---------- */

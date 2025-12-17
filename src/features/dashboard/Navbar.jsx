@@ -77,6 +77,10 @@ export default function Navbar() {
             Centers
           </NavLink>
 
+           <NavLink to="/members" className={linkClasses}>
+            Members
+          </NavLink>
+
           <button
             onClick={logoutUser}
             className="px-4 py-2 rounded-md text-sm font-semibold text-gray-300 hover:bg-white/10 hover:text-white"

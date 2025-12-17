@@ -9,6 +9,8 @@ import ProtectedRoute from "./utils/ProtectedRoute";
 import UserListPage from "./pages/UserListPage";
 import RolePage from "./pages/RolePage";
 import PermissionPage from "./pages/PermissionPage";
+import CentersPage from "./pages/CentersPage";
+import MembersPage from "./pages/MembersPage";
 
 function App() {
 
@@ -36,6 +38,8 @@ function App() {
           <Route path="/users" element={<UserListPage />} />
           <Route path="/roles" element={<RolePage />} />
           <Route path="/permissions" element={<PermissionPage />} />
+          <Route path="/centers" element={<CentersPage />} />
+          <Route path="/members" element={<MembersPage />} />
          </Route>
               </Routes>
     </BrowserRouter>
