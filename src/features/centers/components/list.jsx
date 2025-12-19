@@ -12,7 +12,7 @@ export default function List() {
   const token = sessionStorage.getItem("auth_token");
 
   const {
-    isCenterCreate , centers,currentPage,totalPages,loading
+    isCenterCreate , centers,currentPage,totalPages,loading , isSubmitting
   } = useSelector((state) => state.center);
 
 
@@ -79,10 +79,11 @@ export default function List() {
           if(isCenterCreate !== "error") {
           dispatch(fetchAllCenters({ token, page: currentPage }));
           dispatch(setUpdateStatus());
+          closeModal();
           }
         }
 
-      closeModal();
+      
       reset({ center_name: "", center_address: "" });
   }, [isCenterCreate, reset]);
 
@@ -365,13 +366,20 @@ export default function List() {
                 </button>
 
                 {modalMode !== "view" && (
-                  <button
+                   <button
                     type="submit"
-                    className="px-6 py-2 bg-indigo-600 rounded hover:bg-indigo-700"
+                    disabled={isSubmitting}
+                    className={`px-6 py-2 rounded
+                      ${isSubmitting
+                        ? "bg-indigo-400 cursor-not-allowed"
+                        : "bg-indigo-600 hover:bg-indigo-700"
+                      }`}
                   >
-                    {modalMode === "create"
-                      ? "Create Center"
-                      : "Save Changes"}
+                    {isSubmitting
+                      ? "Processing..."
+                      : modalMode === "create"
+                        ? "Create Center"
+                        : "Save Changes"}
                   </button>
                 )}
               </div>

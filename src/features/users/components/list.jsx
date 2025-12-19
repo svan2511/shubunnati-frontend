@@ -22,7 +22,7 @@ export default function List() {
     users,
     currentPage,
     totalPages,
-    loading,
+    loading,isSubmitting,
     isUserCreate,
   } = useSelector((state) => state.loggedUser);
 
@@ -92,10 +92,11 @@ export default function List() {
           if(isUserCreate !== "error") {
           dispatch(fetchAllUsers({ token, page: currentPage }));
           dispatch(setUpdateStatus());
+          closeModal();
           }
         }
 
-      closeModal();
+      
       reset({ name: "", email: "", roles: [] });
   }, [isUserCreate, reset]);
 
@@ -443,14 +444,22 @@ export default function List() {
                 </button>
 
                 {modalMode !== "view" && (
-                  <button
+                <button
                     type="submit"
-                    className="px-6 py-2 bg-indigo-600 rounded hover:bg-indigo-700"
+                    disabled={isSubmitting}
+                    className={`px-6 py-2 rounded
+                      ${isSubmitting
+                        ? "bg-indigo-400 cursor-not-allowed"
+                        : "bg-indigo-600 hover:bg-indigo-700"
+                      }`}
                   >
-                    {modalMode === "create"
-                      ? "Create User"
-                      : "Save Changes"}
+                    {isSubmitting
+                      ? "Processing..."
+                      : modalMode === "create"
+                        ? "Create User"
+                        : "Save Changes"}
                   </button>
+
                 )}
               </div>
             </form>

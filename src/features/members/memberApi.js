@@ -49,15 +49,15 @@ export function update({token , mData}) {
 }
 
 
-// export function getAllGroupedmembers(token) {
-//   return new Promise(async (resolve ,reject) => {
-//     const response = await fetch(`${config.MEMBER_SERVICE_BASE_URL}/members-grouped`,{
-//       method: 'GET',
-//       headers: { 'content-type': 'application/json' , 'Authorization': 'Bearer '+token },
-//     });
-//     const data = await response.json();
-//     data.success ? resolve({ data }) : reject({ message:data.message });
-//   });
-// }
+export function getSinglemember({ token, id }) {
+  return new Promise(async (resolve ,reject) => {
+    const response = await fetch(`${config.MEMBER_SERVICE_BASE_URL}/members/${id}`,{
+      method: 'GET',
+      headers: { 'content-type': 'application/json' , 'Authorization': 'Bearer '+token },
+    });
+    const data = await response.json();
+    data.success ? resolve({ data }) : reject({ message:data.message });
+  });
+}
 
 

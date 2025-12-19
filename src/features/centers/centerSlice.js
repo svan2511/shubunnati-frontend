@@ -61,6 +61,7 @@ export const centerSlice = createSlice({
     totalRecords: 0,
     loading: false,
     isCenterCreate:null,
+    isSubmitting:false
   },
   // The `reducers` field lets us define reducers and generate associated actions
   reducers: {
@@ -82,32 +83,39 @@ export const centerSlice = createSlice({
     builder
      
       .addCase(fetchAllCenters.pending, (state) => {
-         state.loading = true;       
+         state.loading = true;
+         state.totalRecords="Processing...";
       })
       .addCase(fetchAllCenters.fulfilled, (state, action) => {
           state.loading = false;
+           state.fetchingTextCenter=null;
           state.centers = action.payload.data.centers;
           state.currentPage = action.payload.data.pagination.current_page;
         state.totalPages = action.payload.data.pagination.last_page;
         state.totalRecords = action.payload.data.pagination.total;
       }).addCase(fetchAllCenters.rejected, (state ,action) => { 
           state.loading = false;
+          state.totalRecords = action.error.message;
       })
       
       .addCase(fetchCreateCenter.pending, (state) => {
         state.isCenterCreate = 'pending';
+        state.isSubmitting = true;
       })
       .addCase(fetchCreateCenter.fulfilled, (state, action) => {
           state.isCenterCreate = 'create';
+          state.isSubmitting = false;
       }).addCase(fetchCreateCenter.rejected, (state ,action) => {
         state.isCenterCreate = 'error';
       })
       
        .addCase(fetchUpdateCenter.pending, (state) => {
         state.isCenterCreate = 'pending';
+        state.isSubmitting = true;
       })
       .addCase(fetchUpdateCenter.fulfilled, (state, action) => {
           state.isCenterCreate = 'update';
+          state.isSubmitting = false;
       }).addCase(fetchUpdateCenter.rejected, (state ,action) => {
         state.isCenterCreate = 'error';
       })

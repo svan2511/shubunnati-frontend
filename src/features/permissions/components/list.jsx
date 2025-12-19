@@ -23,7 +23,7 @@ export default function List() {
   const token = sessionStorage.getItem("auth_token");
 
   const {
-    isPermissionCreate,permissions,currentPage,totalPages,loading
+    isPermissionCreate,permissions,currentPage,totalPages,loading,isSubmitting
   } = useSelector((state) => state.permission);
 
   const roles = useSelector((state) => state.role.roles);
@@ -92,10 +92,11 @@ export default function List() {
           if(isPermissionCreate !== "error") {
           dispatch(fetchAllPermissions({ token, page: currentPage }));
           dispatch(setUpdateStatus());
+          closeModal();
           }
         }
 
-      closeModal();
+      
       reset({ name: "", email: "", roles: [] });
   }, [isPermissionCreate, reset]);
 
@@ -417,11 +418,18 @@ export default function List() {
                 {modalMode !== "view" && (
                   <button
                     type="submit"
-                    className="px-6 py-2 bg-indigo-600 rounded hover:bg-indigo-700"
+                    disabled={isSubmitting}
+                    className={`px-6 py-2 rounded
+                      ${isSubmitting
+                        ? "bg-indigo-400 cursor-not-allowed"
+                        : "bg-indigo-600 hover:bg-indigo-700"
+                      }`}
                   >
-                    {modalMode === "create"
-                      ? "Create Permission"
-                      : "Save Changes"}
+                    {isSubmitting
+                      ? "Processing..."
+                      : modalMode === "create"
+                        ? "Create Permission"
+                        : "Save Changes"}
                   </button>
                 )}
               </div>

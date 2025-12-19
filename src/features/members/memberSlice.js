@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { create, deleteMember, getAllMembers, update } from './memberApi';
+import { create, deleteMember, getAllMembers, getSinglemember, update } from './memberApi';
 
 export const fetchAllMembers = createAsyncThunk(
   'member/allMembers',
@@ -10,14 +10,14 @@ export const fetchAllMembers = createAsyncThunk(
   }
 );
 
-// export const fetchGroupedPermissions = createAsyncThunk(
-//   'permission/groupedPermissions',
-//   async (token) => {
-//     const response = await getAllGroupedPermissions(token);
-//     // The value we return becomes the `fulfilled` action payload
-//     return response.data;
-//   }
-// );
+export const fetchSingleMember = createAsyncThunk(
+  'member/singleMember',
+  async ({ token, id }) => {
+    const response = await getSinglemember({ token, id });
+    // The value we return becomes the `fulfilled` action payload
+    return response.data;
+  }
+);
 
 
 export const fetchCreateMember = createAsyncThunk(
@@ -58,7 +58,11 @@ export const memberSlice = createSlice({
     totalPages: 1,
     totalRecords: 0,
     loading: false,
-    isMemberCreate:null
+    isMemberCreate:null,
+    singleMember:null,
+    member:null,
+    emis:[],
+    isSubmitting:false
   },
   // The `reducers` field lets us define reducers and generate associated actions
   reducers: {
@@ -80,7 +84,8 @@ export const memberSlice = createSlice({
     builder
      
       .addCase(fetchAllMembers.pending, (state) => {
-         state.loading = true;       
+         state.loading = true;
+         state.totalRecords = 'Processing...';    
       })
       .addCase(fetchAllMembers.fulfilled, (state, action) => {
           state.loading = false;
@@ -90,22 +95,27 @@ export const memberSlice = createSlice({
         state.totalRecords = action.payload.data.pagination.total;
       }).addCase(fetchAllMembers.rejected, (state ,action) => { 
           state.loading = false;
+          state.totalRecords = action.error.message;
       })
       
       .addCase(fetchCreateMember.pending, (state) => {
         state.isMemberCreate = 'pending';
+        state.isSubmitting = true;
       })
       .addCase(fetchCreateMember.fulfilled, (state, action) => {
           state.isMemberCreate = 'create';
+          state.isSubmitting = false;
       }).addCase(fetchCreateMember.rejected, (state ,action) => {
         state.isMemberCreate = 'error';
       })
       
        .addCase(fetchUpdateMember.pending, (state) => {
         state.isMemberCreate = 'pending';
+        state.isSubmitting = true;
       })
       .addCase(fetchUpdateMember.fulfilled, (state, action) => {
           state.isMemberCreate = 'update';
+          state.isSubmitting = false;
       }).addCase(fetchUpdateMember.rejected, (state ,action) => {
         state.isMemberCreate = 'error';
       })
@@ -117,7 +127,21 @@ export const memberSlice = createSlice({
           state.isMemberCreate = 'delete';
       }).addCase(fetchDeleteMember.rejected, (state ,action) => {
         state.isMemberCreate = 'error';
-      });
+      })
+
+       .addCase(fetchSingleMember.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchSingleMember.fulfilled, (state, action) => {
+          state.member = action.payload.data.member;
+          state.emis = action.payload.data.member.emis;
+          state.loading = false;
+      }).addCase(fetchSingleMember.rejected, (state ,action) => {
+          state.loading = true;
+      })
+      
+    
+      ;
       
   },
 });

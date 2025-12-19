@@ -22,7 +22,7 @@ export default function List() {
   const token = sessionStorage.getItem("auth_token");
   const navigate = useNavigate();
 
-  const { isMemberCreate, members, currentPage, totalPages, loading ,isSubmitting } = useSelector((state) => state.member);
+  const { isMemberCreate, members, currentPage, totalPages, loading } = useSelector((state) => state.member);
   const centers = useSelector((state) => state.center.centers);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -87,11 +87,10 @@ export default function List() {
       if (isMemberCreate !== "error") {
         dispatch(fetchAllMembers({ token, page: currentPage }));
         dispatch(setUpdateStatus());
-        closeModal();
       }
     }
 
-    
+    closeModal();
     reset({
       mem_name: "",
       mem_phone: "",
@@ -478,21 +477,13 @@ export default function List() {
                 {modalMode !== "view" && (
                   <button
                     type="submit"
-                    disabled={isSubmitting || uploading || !imagePreview}
+                    disabled={uploading || !imagePreview}
                     className={`px-6 py-2 rounded ${
-                      uploading || !imagePreview || isSubmitting ? "bg-gray-700 cursor-not-allowed" : "bg-indigo-600 hover:bg-indigo-700"
+                      uploading || !imagePreview ? "bg-gray-700 cursor-not-allowed" : "bg-indigo-600 hover:bg-indigo-700"
                     }`}
                   >
-                   
-                   {isSubmitting
-                      ? "Processing..."
-                      : modalMode === "create"
-                        ? "Create User"
-                        : "Save Changes"}
-                        
+                    {modalMode === "create" ? "Create Member" : "Save Changes"}
                   </button>
-
-              
                 )}
               </div>
             </form>

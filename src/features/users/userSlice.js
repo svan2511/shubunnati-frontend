@@ -72,7 +72,8 @@ export const userSlice = createSlice({
     totalPages: 1,
     totalRecords: 0,
     loading: false,
-    isUserCreate:null
+    isUserCreate:null,
+    isSubmitting:false
   },
   // The `reducers` field lets us define reducers and generate associated actions
   reducers: {
@@ -82,6 +83,7 @@ export const userSlice = createSlice({
     },
     setUpdateStatus: (state, action) => {
       state.isUserCreate = null;
+      state.isSubmitting=false;
     },
     
   },
@@ -111,13 +113,12 @@ export const userSlice = createSlice({
           state.isAuthenticated = false;
           sessionStorage.removeItem("auth_token");
       }).addCase(fetchUserLogout.rejected, (state ,action) => { 
-        console.log(action.error.message , 'hhhhh');
         state.responseMsg = action.error.message;
       })
       
       .addCase(fetchAllUsers.pending, (state) => {
          state.loading = true;       
-        state.fetchingTextUser = 'Wait getting data...';
+        state.fetchingTextUser = 'Processing...';
       })
       .addCase(fetchAllUsers.fulfilled, (state, action) => {
         state.loading = false;
@@ -133,18 +134,22 @@ export const userSlice = createSlice({
       
       .addCase(fetchCreateUser.pending, (state) => {
         state.isUserCreate = 'pending';
+        state.isSubmitting = true;
       })
       .addCase(fetchCreateUser.fulfilled, (state, action) => {
           state.isUserCreate = 'create';
+           state.isSubmitting = false;
       }).addCase(fetchCreateUser.rejected, (state ,action) => {
         state.isUserCreate = 'error';
       })
       
        .addCase(fetchUpdateUser.pending, (state) => {
         state.isUserCreate = 'pending';
+        state.isSubmitting = true;
       })
       .addCase(fetchUpdateUser.fulfilled, (state, action) => {
           state.isUserCreate = 'update';
+          state.isSubmitting = false;
       }).addCase(fetchUpdateUser.rejected, (state ,action) => {
         state.isUserCreate = 'error';
       })

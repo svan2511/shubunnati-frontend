@@ -48,7 +48,8 @@ export const roleSlice = createSlice({
     totalPages: 1,
     totalRecords: 0,
     loading: false,
-    isRoleCreate:null
+    isRoleCreate:null,
+    isSubmitting:false
   },
   // The `reducers` field lets us define reducers and generate associated actions
   reducers: {
@@ -84,18 +85,22 @@ export const roleSlice = createSlice({
       
       .addCase(fetchCreateRole.pending, (state) => {
         state.isRoleCreate = 'pending';
+        state.isSubmitting = true;
       })
       .addCase(fetchCreateRole.fulfilled, (state, action) => {
           state.isRoleCreate = 'create';
+          state.isSubmitting = false;
       }).addCase(fetchCreateRole.rejected, (state ,action) => {
         state.isRoleCreate = 'error';
       })
       
        .addCase(fetchUpdateRole.pending, (state) => {
         state.isRoleCreate = 'pending';
+        state.isSubmitting = true;
       })
       .addCase(fetchUpdateRole.fulfilled, (state, action) => {
           state.isRoleCreate = 'update';
+          state.isSubmitting = false;
       }).addCase(fetchUpdateRole.rejected, (state ,action) => {
         state.isRoleCreate = 'error';
       })

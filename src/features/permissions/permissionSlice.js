@@ -61,7 +61,8 @@ export const permissionSlice = createSlice({
     totalRecords: 0,
     loading: false,
     isPermissionCreate:null,
-    groupedPermissions:[]
+    groupedPermissions:[],
+    isSubmitting:false
   },
   // The `reducers` field lets us define reducers and generate associated actions
   reducers: {
@@ -98,18 +99,22 @@ export const permissionSlice = createSlice({
       
       .addCase(fetchCreatePermission.pending, (state) => {
         state.isPermissionCreate = 'pending';
+        state.isSubmitting = true;
       })
       .addCase(fetchCreatePermission.fulfilled, (state, action) => {
           state.isPermissionCreate = 'create';
+          state.isSubmitting = false;
       }).addCase(fetchCreatePermission.rejected, (state ,action) => {
         state.isPermissionCreate = 'error';
       })
       
        .addCase(fetchUpdatePermission.pending, (state) => {
         state.isPermissionCreate = 'pending';
+        state.isSubmitting = true;
       })
       .addCase(fetchUpdatePermission.fulfilled, (state, action) => {
           state.isPermissionCreate = 'update';
+          state.isSubmitting = false;
       }).addCase(fetchUpdatePermission.rejected, (state ,action) => {
         state.isPermissionCreate = 'error';
       })

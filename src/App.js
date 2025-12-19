@@ -11,6 +11,7 @@ import RolePage from "./pages/RolePage";
 import PermissionPage from "./pages/PermissionPage";
 import CentersPage from "./pages/CentersPage";
 import MembersPage from "./pages/MembersPage";
+import MemberViewPage from "./pages/MemberViewPage";
 
 function App() {
 
@@ -40,6 +41,7 @@ function App() {
           <Route path="/permissions" element={<PermissionPage />} />
           <Route path="/centers" element={<CentersPage />} />
           <Route path="/members" element={<MembersPage />} />
+          <Route path="/members/:id" element={<MemberViewPage />} />
          </Route>
               </Routes>
     </BrowserRouter>
