@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 
 import Navbar from "../../dashboard/Navbar";
-import {MySwal} from "../../../utils/alert";
+import {can, MySwal} from "../../../utils/alert";
 
 import {
   fetchAllUsers,
@@ -49,9 +49,9 @@ export default function List() {
 
   /* ================= Fetch ================= */
   useEffect(() => {
-    dispatch(fetchAllUsers({ token, page: currentPage }));
-    dispatch(fetchAllRoles({token, page:"ALL" }));
-  }, [dispatch, token, currentPage]);
+    dispatch(fetchAllUsers({ page: currentPage }));
+    dispatch(fetchAllRoles({ page:"ALL" }));
+  }, [dispatch, currentPage]);
 
   /* ================= Toast ================= */
   useEffect(() => {
@@ -90,7 +90,7 @@ export default function List() {
           });
 
           if(isUserCreate !== "error") {
-          dispatch(fetchAllUsers({ token, page: currentPage }));
+          dispatch(fetchAllUsers({ page: currentPage }));
           dispatch(setUpdateStatus());
           closeModal();
           }
@@ -152,10 +152,10 @@ export default function List() {
   const onSubmit = (formData) => {
     console.log(formData);
     if (modalMode === "create") {
-      dispatch(fetchCreateUser({ token, userdata: formData }));
+      dispatch(fetchCreateUser({ userdata: formData }));
     }
      if (modalMode === "edit") {
-      dispatch(fetchUpdateUser({ token, userdata: formData }));
+      dispatch(fetchUpdateUser({ userdata: formData }));
     }
   };
 
@@ -177,7 +177,7 @@ export default function List() {
       },
     }).then((res) => {
       if (res.isConfirmed) {
-        dispatch(fetchDeleteUser({token , userId}));
+        dispatch(fetchDeleteUser({ userId}));
       }
     });
   };
@@ -209,12 +209,12 @@ export default function List() {
       <div className="max-w-7xl mx-auto p-6">
         <div className="flex justify-between mb-6">
           <h1 className="text-2xl font-bold">Users</h1>
-          <button
+        { can('create-users') && <button
             onClick={openCreateModal}
             className="px-4 py-2 bg-indigo-600 rounded hover:bg-indigo-700"
           >
             + Add User
-          </button>
+          </button>}
         </div>
 
         {/* Table */}
@@ -261,24 +261,27 @@ export default function List() {
                   </td>
                   <td className="px-4 py-3 text-center">
                     <div className="flex justify-center gap-2">
-                      <button
+                     {
+                      can('view-users') &&
+                       <button
                         onClick={() => openViewModal(user)}
                         className="px-3 py-1 bg-blue-600 rounded"
                       >
                         View
                       </button>
-                      <button
+                     }
+                      { can('edit-users') && <button
                         onClick={() => openEditModal(user)}
                         className="px-3 py-1 bg-yellow-500 text-black rounded"
                       >
                         Edit
-                      </button>
-                      <button
+                      </button> }
+                     { can('delete-users') && <button
                         onClick={() => handleDelete(user.id)}
                         className="px-3 py-1 bg-red-600 rounded"
                       >
                         Delete
-                      </button>
+                      </button>}
                     </div>
                   </td>
                 </tr>

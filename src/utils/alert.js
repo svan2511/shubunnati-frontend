@@ -1,6 +1,7 @@
 // src/utils/alert.js
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
+import {store} from "../app/store";
 
 export const MySwal = withReactContent(Swal);
 
@@ -30,3 +31,19 @@ export const getBgColor = (name = "") => {
   const index = name.charCodeAt(0) % colors.length;
   return colors[index];
 };
+
+// function for validate permisiions .
+
+export const can = (permission) => {
+  const statePermissions = store.getState()?.loggedUser?.userPermissions;
+
+  const permissions =
+    Array.isArray(statePermissions) && statePermissions.length > 0
+      ? statePermissions
+      : JSON.parse(sessionStorage.getItem("user_permissions") || "[]");
+
+  return permissions.includes(permission);
+};
+
+
+

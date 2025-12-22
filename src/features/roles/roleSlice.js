@@ -4,8 +4,8 @@ import { create, deleteRole, getAllRoles, update } from './rolesApi';
 
 export const fetchAllRoles = createAsyncThunk(
   'role/allRoles',
-  async ({ token, page}) => {
-    const response = await getAllRoles({ token, page });
+  async ({ page}) => {
+    const response = await getAllRoles({ page });
     // The value we return becomes the `fulfilled` action payload
     return response.data;
   }
@@ -14,8 +14,8 @@ export const fetchAllRoles = createAsyncThunk(
 
 export const fetchCreateRole = createAsyncThunk(
   'role/create',
-  async ({ token,roleData }) => {
-    const response = await create({token , roleData});
+  async ({ roleData }) => {
+    const response = await create({ roleData});
     // The value we return becomes the `fulfilled` action payload
     return response.data;
   }
@@ -23,8 +23,8 @@ export const fetchCreateRole = createAsyncThunk(
 
 export const fetchUpdateRole = createAsyncThunk(
   'role/update',
-  async ({ token,roleData }) => {
-    const response = await update({token , roleData});
+  async ({ roleData }) => {
+    const response = await update({ roleData});
     // The value we return becomes the `fulfilled` action payload
     return response.data;
   }
@@ -32,8 +32,8 @@ export const fetchUpdateRole = createAsyncThunk(
 
 export const fetchDeleteRole = createAsyncThunk(
   'role/delete',
-  async ({ token,Id }) => {
-    const response = await deleteRole({token , Id});
+  async ({ Id }) => {
+    const response = await deleteRole({ Id});
     // The value we return becomes the `fulfilled` action payload
     return response.data;
   }

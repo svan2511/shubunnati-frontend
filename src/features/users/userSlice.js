@@ -21,8 +21,8 @@ export const fetchUserLogout = createAsyncThunk(
 
 export const fetchAllUsers = createAsyncThunk(
   'user/allUsers',
-  async ({ token, page}) => {
-    const response = await getAllUsers({ token, page });
+  async ({ page}) => {
+    const response = await getAllUsers({ page });
     // The value we return becomes the `fulfilled` action payload
     return response.data;
   }
@@ -31,8 +31,8 @@ export const fetchAllUsers = createAsyncThunk(
 
 export const fetchCreateUser = createAsyncThunk(
   'user/create',
-  async ({ token,userdata }) => {
-    const response = await create({token , userdata});
+  async ({ userdata }) => {
+    const response = await create({ userdata});
     // The value we return becomes the `fulfilled` action payload
     return response.data;
   }
@@ -40,8 +40,8 @@ export const fetchCreateUser = createAsyncThunk(
 
 export const fetchUpdateUser = createAsyncThunk(
   'user/update',
-  async ({ token,userdata }) => {
-    const response = await update({token , userdata});
+  async ({ userdata }) => {
+    const response = await update({ userdata});
     // The value we return becomes the `fulfilled` action payload
     return response.data;
   }
@@ -49,8 +49,8 @@ export const fetchUpdateUser = createAsyncThunk(
 
 export const fetchDeleteUser = createAsyncThunk(
   'user/delete',
-  async ({ token,userId }) => {
-    const response = await deleteUser({token , userId});
+  async ({ userId }) => {
+    const response = await deleteUser({ userId});
     // The value we return becomes the `fulfilled` action payload
     return response.data;
   }
@@ -73,17 +73,22 @@ export const userSlice = createSlice({
     totalRecords: 0,
     loading: false,
     isUserCreate:null,
-    isSubmitting:false
+    isSubmitting:false,
+    userPermissions:[],
+    permissionsLoaded:false
   },
   // The `reducers` field lets us define reducers and generate associated actions
   reducers: {
    setAuthFromStorage: (state, action) => {
       state.token = action.payload.token;
       state.isAuthenticated = true;
+       state.userPermissions = action.payload.permissions || [];
+      state.permissionsLoaded = true;
     },
     setUpdateStatus: (state, action) => {
       state.isUserCreate = null;
       state.isSubmitting=false;
+     
     },
     
   },
@@ -98,7 +103,12 @@ export const userSlice = createSlice({
         state.loadingText = 'Sign in';
         state.loggedUser = action.payload.data.user;
         state.isAuthenticated = true;
+        state.userPermissions = action.payload.data.user.permissions;
+        state.permissionsLoaded = true;
         sessionStorage.setItem("auth_token", action.payload.data.access_token);
+        sessionStorage.setItem("user_permissions", JSON.stringify(action.payload.data.user.permissions));
+        sessionStorage.setItem("token_version", action.payload.data.user.token_version);
+        
       }).addCase(fetchUserLogin.rejected, (state ,action) => { 
         state.loadingText = 'Sign in';
         state.responseMsg = action.error.message;
@@ -108,10 +118,15 @@ export const userSlice = createSlice({
         state.loadingText = 'Wait...';
       })
       .addCase(fetchUserLogout.fulfilled, (state, action) => {
-        state.loadingText = 'Sign in';
+          state.loadingText = 'Sign in';
           state.loggedUser = null;
           state.isAuthenticated = false;
+          state.userPermissions = [];
+          state.permissionsLoaded = false;
           sessionStorage.removeItem("auth_token");
+          sessionStorage.removeItem("user_permissions");
+          sessionStorage.removeItem("token_version");
+
       }).addCase(fetchUserLogout.rejected, (state ,action) => { 
         state.responseMsg = action.error.message;
       })

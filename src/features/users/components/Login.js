@@ -2,6 +2,9 @@ import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, Navigate } from "react-router-dom";
 import { fetchUserLogin } from "../userSlice";
+import { useEffect } from "react";
+import { MySwal } from "../../../utils/alert";
+
 
 export default function Login() {
   const { register, handleSubmit, formState: { errors } } = useForm();
@@ -10,6 +13,21 @@ export default function Login() {
   const isAuthenticated = useSelector((state) => state.loggedUser.isAuthenticated );
   const responseMsg = useSelector((state) => state.loggedUser.responseMsg );
   const dispatch = useDispatch();
+
+  useEffect(() => {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get("reason") === "session_expired") {
+    MySwal.fire({
+      toast: true,
+      position: "top-end",
+      icon: "error",
+      title: "Your session has expired. Please login again.",
+      showConfirmButton: false,
+      timer: 4000,
+    });
+  }
+}, []);
+
 
 
   const getFormdata = (data) =>  {

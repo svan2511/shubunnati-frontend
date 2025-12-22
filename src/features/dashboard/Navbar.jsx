@@ -1,12 +1,19 @@
 import { NavLink, useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import {MySwal} from "../../utils/alert";
+import { useDispatch, useSelector } from "react-redux";
+import {can, MySwal} from "../../utils/alert";
 import { fetchUserLogout } from "../../features/users/userSlice";
 
 export default function Navbar() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const token = sessionStorage.getItem("auth_token");
+
+  const { isAuthenticated, permissionsLoaded } = useSelector((state) => state.loggedUser);
+   
+  console.log(isAuthenticated, permissionsLoaded);
+  if (!isAuthenticated || !permissionsLoaded) {
+       return null;
+  }
+
 
   const linkClasses = ({ isActive }) =>
     `px-4 py-2 rounded-md text-sm font-semibold transition ${
@@ -31,8 +38,7 @@ export default function Navbar() {
       },
     }).then(async (result) => {
       if (result.isConfirmed) {
-        await dispatch(fetchUserLogout(token));
-
+        await dispatch(fetchUserLogout());
         MySwal.fire({
           title: "Logged out successfully!",
           icon: "success",
@@ -50,44 +56,58 @@ export default function Navbar() {
   };
 
   return (
+    
     <nav className="border-b border-white/10 bg-gray-900">
       <div className="mx-auto max-w-7xl px-6 py-4 flex items-center justify-between">
         <h1 className="text-lg font-bold text-white">
           Subh Unnati Micro Finance
         </h1>
 
-        <div className="flex gap-2">
+       <div className="flex gap-2">
+        {can("view-dashboard") && (
           <NavLink to="/dashboard" className={linkClasses}>
             Dashboard
           </NavLink>
+        )}
 
+        {can("view-users") && (
           <NavLink to="/users" className={linkClasses}>
             Users
           </NavLink>
+        )}
 
+        {can("view-roles") && (
           <NavLink to="/roles" className={linkClasses}>
             Roles
           </NavLink>
+        )}
 
-           <NavLink to="/permissions" className={linkClasses}>
+        {can("view-permissions") && (
+          <NavLink to="/permissions" className={linkClasses}>
             Permissions
           </NavLink>
+        )}
 
+        {can("view-centers") && (
           <NavLink to="/centers" className={linkClasses}>
             Centers
           </NavLink>
+        )}
 
-           <NavLink to="/members" className={linkClasses}>
+        {can("view-members") && (
+          <NavLink to="/members" className={linkClasses}>
             Members
           </NavLink>
+  )}
 
-          <button
-            onClick={logoutUser}
-            className="px-4 py-2 rounded-md text-sm font-semibold text-gray-300 hover:bg-white/10 hover:text-white"
-          >
-            Logout
-          </button>
-        </div>
+  <button
+    onClick={logoutUser}
+    className="px-4 py-2 rounded-md text-sm font-semibold text-gray-300 hover:bg-white/10 hover:text-white"
+  >
+    Logout
+  </button>
+</div>
+
       </div>
     </nav>
   );

@@ -5,8 +5,8 @@ import { create, deletePermission, getAllGroupedPermissions, getAllPermissions, 
 
 export const fetchAllPermissions = createAsyncThunk(
   'permission/allPermissions',
-  async ({ token, page}) => {
-    const response = await getAllPermissions({ token, page });
+  async ({ page}) => {
+    const response = await getAllPermissions({ page });
     // The value we return becomes the `fulfilled` action payload
     return response.data;
   }
@@ -24,8 +24,8 @@ export const fetchGroupedPermissions = createAsyncThunk(
 
 export const fetchCreatePermission = createAsyncThunk(
   'permission/create',
-  async ({ token,pData }) => {
-    const response = await create({token , pData});
+  async ({ pData }) => {
+    const response = await create({ pData});
     // The value we return becomes the `fulfilled` action payload
     return response.data;
   }
@@ -33,8 +33,8 @@ export const fetchCreatePermission = createAsyncThunk(
 
 export const fetchUpdatePermission = createAsyncThunk(
   'permission/update',
-  async ({ token,pData }) => {
-    const response = await update({token , pData});
+  async ({ pData }) => {
+    const response = await update({ pData});
     // The value we return becomes the `fulfilled` action payload
     return response.data;
   }
@@ -42,8 +42,8 @@ export const fetchUpdatePermission = createAsyncThunk(
 
 export const fetchDeletePermission = createAsyncThunk(
   'permission/delete',
-  async ({ token,Id }) => {
-    const response = await deletePermission({token , Id});
+  async ({ Id }) => {
+    const response = await deletePermission({Id});
     // The value we return becomes the `fulfilled` action payload
     return response.data;
   }

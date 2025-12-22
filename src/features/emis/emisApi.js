@@ -1,25 +1,29 @@
 import config from "../../config";
+import { apiFetch } from "../../utils/basicApi";
 
-export function update({token , emiData}) {
-  
-  return new Promise(async (resolve ,reject) => {
-    const response = await fetch(`${config.MEMBER_SERVICE_BASE_URL}/emis/${emiData.id}`,{
-      method: 'PUT',
-      body: JSON.stringify(emiData),
-      headers: { 'content-type': 'application/json' , 'Authorization': 'Bearer '+token },
-    });
-    const data = await response.json();
-    data.success ? resolve({ data }) : reject({ message:data.message });
-  });
+function successOrThrow(data) {
+  if (!data?.success) {
+    throw new Error(data?.message || "Operation failed");
+  }
+  return { data };
 }
 
-export function getDashboardData({token , filterData} ) {
-  return new Promise(async (resolve ,reject) => {
-    const response = await fetch(`${config.MEMBER_SERVICE_BASE_URL}/dashboard-data`,{
-      method: 'GET',
-      headers: { 'content-type': 'application/json' , 'Authorization': 'Bearer '+token },
-    });
-    const data = await response.json();
-    data.success ? resolve({ data }) : reject({ message:data.message });
-  });
+export async function update({ emiData }) {
+  const data = await apiFetch(
+    `${config.MEMBER_SERVICE_BASE_URL}/emis/${emiData.id}`,
+    {
+      method: "PUT",
+      body: emiData,
+    }
+  );
+
+  return successOrThrow(data);
+}
+
+export async function getDashboardData({ filterData } = {}) {
+  const data = await apiFetch(
+    `${config.MEMBER_SERVICE_BASE_URL}/dashboard-data`
+  );
+
+  return successOrThrow(data);
 }

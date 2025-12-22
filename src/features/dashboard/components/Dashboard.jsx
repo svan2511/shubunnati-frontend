@@ -14,7 +14,7 @@ import {
 } from "recharts";
 
 import { fetchAllUsers, fetchUserLogout } from "../../users/userSlice";
-import MySwal from "../../../utils/alert";
+import MySwal, { can } from "../../../utils/alert";
 import { useEffect, useState } from "react";
 import { fetchAllCenters } from "../../centers/centerSlice";
 import { fetchAllMembers } from "../../members/memberSlice";
@@ -22,10 +22,10 @@ import { fetchDashboardData } from "../../emis/emisSlice";
 
 export default function Dashboard() {
   const dispatch = useDispatch();
-  const token = sessionStorage.getItem("auth_token");
-  const userText = useSelector(
-    (state) => state.loggedUser.fetchingTextUser
-  );
+ 
+
+  const { fetchingTextUser , isAuthenticated} = useSelector( (state) => state.loggedUser );
+
   const dashBoardData = useSelector((state) => state.emi.dashBoardData);
   const totalCenters = useSelector((state) => state.center.totalRecords);
   const totalMembers = useSelector((state) => state.member.totalRecords);
@@ -42,20 +42,19 @@ export default function Dashboard() {
 
 
   useEffect(() => {
-    dispatch(fetchAllUsers({ token, page: 1 }));
-    dispatch(fetchAllCenters({ token, page: 1 }));
-    dispatch(fetchAllMembers({ token, page: 1 }));
-    dispatch(fetchDashboardData({token , filterData:{}}));
-  }, [dispatch, token]);
+    dispatch(fetchAllUsers({ page: 1 }));
+    dispatch(fetchAllCenters({ page: 1 }));
+    dispatch(fetchAllMembers({ page: 1 , centerId : "ALL" }));
+    dispatch(fetchDashboardData({ filterData:{}}));
+  }, [dispatch]);
 
   /* ---------- Static KPI Data ---------- */
   const stats = [
-    { title: "Total Users", value: userText },
+    { title: "Total Users", value: fetchingTextUser },
     { title: "Total Members", value: totalMembers },
     { title: "Total Centers", value: totalCenters },
   ];
 
-  console.log(userText);
 
    if (showLoader) {
     return (
@@ -104,7 +103,8 @@ export default function Dashboard() {
         </div>
 
         {/* ---------- Chart First ---------- */}
-        <div className="rounded-xl bg-white/5 p-6 border border-white/10 mb-10">
+
+        {can('dashboard-stats') &&  <div className="rounded-xl bg-white/5 p-6 border border-white/10 mb-10">
           <h3 className="text-lg font-semibold mb-4">
             Disbursement vs Collection (Last 12 Months)
           </h3>
@@ -132,10 +132,11 @@ export default function Dashboard() {
               </BarChart>
             </ResponsiveContainer>
           </div>
-        </div>
+        </div> }
+       
 
         {/* ---------- Chart Second ---------- */}
-                <div className="rounded-xl bg-white/5 p-6 border border-white/10 mb-10">
+        {can('dashboard-stats') &&  <div className="rounded-xl bg-white/5 p-6 border border-white/10 mb-10">
                   <h3 className="text-lg font-semibold mb-4">
                     Demand vs OD (Last 12 Months)
                   </h3>
@@ -163,7 +164,8 @@ export default function Dashboard() {
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
-                </div>
+                </div> }
+               
         {/* ---------- Info & Activity ---------- */}
        
       </div>

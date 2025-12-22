@@ -3,13 +3,14 @@ import { useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 
 import Navbar from "../../dashboard/Navbar";
-import {MySwal , formatTitle } from "../../../utils/alert";
+import {MySwal , can, formatTitle } from "../../../utils/alert";
 import { fetchAllCenters, fetchCreateCenter, fetchDeleteCenter, fetchUpdateCenter, setCurrentPage, setUpdateStatus } from "../centerSlice";
+import { useNavigate } from "react-router-dom";
 
 
 export default function List() {
   const dispatch = useDispatch();
-  const token = sessionStorage.getItem("auth_token");
+  const navigate = useNavigate();
 
   const {
     isCenterCreate , centers,currentPage,totalPages,loading , isSubmitting
@@ -36,9 +37,9 @@ export default function List() {
 
   /* ================= Fetch ================= */
   useEffect(() => {
-    dispatch(fetchAllCenters({ token, page: currentPage }));
+    dispatch(fetchAllCenters({ page: currentPage }));
     // dispatch(fetchAllRoles(token));
-  }, [dispatch, token, currentPage]);
+  }, [dispatch, currentPage]);
 
   /* ================= Toast ================= */
   useEffect(() => {
@@ -77,7 +78,7 @@ export default function List() {
           });
 
           if(isCenterCreate !== "error") {
-          dispatch(fetchAllCenters({ token, page: currentPage }));
+          dispatch(fetchAllCenters({ page: currentPage }));
           dispatch(setUpdateStatus());
           closeModal();
           }
@@ -123,10 +124,10 @@ export default function List() {
     
     if (modalMode === "create") {
       
-      dispatch(fetchCreateCenter({ token, centerData: formData }));
+      dispatch(fetchCreateCenter({ centerData: formData }));
     }
      if (modalMode === "edit") {
-      dispatch(fetchUpdateCenter({ token, centerData: formData }));
+      dispatch(fetchUpdateCenter({ centerData: formData }));
     }
   };
 
@@ -148,7 +149,7 @@ export default function List() {
       },
     }).then((res) => {
       if (res.isConfirmed) {
-        dispatch(fetchDeleteCenter({token , Id}));
+        dispatch(fetchDeleteCenter({ Id}));
       }
     });
   };
@@ -180,12 +181,12 @@ export default function List() {
       <div className="max-w-7xl mx-auto p-6">
         <div className="flex justify-between mb-6">
           <h1 className="text-2xl font-bold">Centers</h1>
-          <button
+       { can('create-centers') &&  <button
             onClick={openCreateModal}
             className="px-4 py-2 bg-indigo-600 rounded hover:bg-indigo-700"
           >
             + Add Center
-          </button>
+          </button>}
         </div>
 
         {/* Table */}
@@ -222,24 +223,24 @@ export default function List() {
                  
                   <td className="px-4 py-3 text-center">
                     <div className="flex justify-center gap-2">
-                      <button
-                        onClick={() => openViewModal(center)}
+                  { can('view-centers') &&   <button
+                        onClick={() => navigate(`/centers/center/${center.id}`)}
                         className="px-3 py-1 bg-blue-600 rounded"
                       >
                         View
-                      </button>
-                      <button
+                      </button>}
+                    { can('edit-centers') &&  <button
                         onClick={() => openEditModal(center)}
                         className="px-3 py-1 bg-yellow-500 text-black rounded"
                       >
                         Edit
-                      </button>
-                      <button
+                      </button>}
+                    { can('delete-centers') && <button
                         onClick={() => handleDelete(center.id)}
                         className="px-3 py-1 bg-red-600 rounded"
                       >
                         Delete
-                      </button>
+                      </button>}
                     </div>
                   </td>
                 </tr>

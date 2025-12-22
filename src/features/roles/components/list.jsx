@@ -50,9 +50,9 @@ export default function List() {
 
   /* ================= Fetch ================= */
   useEffect(() => {
-    dispatch(fetchAllRoles({ token, page: currentPage }));
-    dispatch(fetchGroupedPermissions(token));
-  }, [dispatch, token, currentPage]);
+    dispatch(fetchAllRoles({ page: currentPage }));
+    dispatch(fetchGroupedPermissions());
+  }, [dispatch, currentPage]);
 
   /* ================= Toast ================= */
   useEffect(() => {
@@ -91,7 +91,7 @@ export default function List() {
           });
 
           if(isRoleCreate !== "error") {
-          dispatch(fetchAllRoles({ token, page: currentPage }));
+          dispatch(fetchAllRoles({ page: currentPage }));
           dispatch(setUpdateStatus());
           closeModal();
           }
@@ -142,10 +142,10 @@ export default function List() {
     
     if (modalMode === "create") {
    
-      dispatch(fetchCreateRole({ token, roleData: formData }));
+      dispatch(fetchCreateRole({  roleData: formData }));
     }
      if (modalMode === "edit") {
-      dispatch(fetchUpdateRole({ token, roleData: formData }));
+      dispatch(fetchUpdateRole({  roleData: formData }));
     }
   };
 
@@ -167,7 +167,7 @@ export default function List() {
       },
     }).then((res) => {
       if (res.isConfirmed) {
-        dispatch(fetchDeleteRole({token , Id}));
+        dispatch(fetchDeleteRole({ Id}));
       }
     });
   };

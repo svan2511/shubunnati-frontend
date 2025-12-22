@@ -12,6 +12,8 @@ import PermissionPage from "./pages/PermissionPage";
 import CentersPage from "./pages/CentersPage";
 import MembersPage from "./pages/MembersPage";
 import MemberViewPage from "./pages/MemberViewPage";
+import NotFoundPage from "./pages/NotfountPage";
+import UnauthorizesPage from "./pages/UnauthorizePage";
 
 function App() {
 
@@ -19,10 +21,11 @@ function App() {
 
    useEffect(() => {
     const token = sessionStorage.getItem("auth_token");
+     const permissions = sessionStorage.getItem("user_permissions");
 
-    if (token) {
+    if (token && permissions) {
       dispatch(
-        setAuthFromStorage({ token })
+        setAuthFromStorage({ token ,  permissions: JSON.parse(permissions) })
       );
     }
   }, [dispatch]);
@@ -34,15 +37,47 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
 
-         <Route element={<ProtectedRoute />}>
-         <Route path="/dashboard" element={<DashboardPage />} />
+          <Route element={<ProtectedRoute permission="view-dashboard" />}>
+          <Route path="/dashboard" element={<DashboardPage />} />
+          </Route>
+         
+          <Route element={<ProtectedRoute permission="view-users" />}>
           <Route path="/users" element={<UserListPage />} />
-          <Route path="/roles" element={<RolePage />} />
-          <Route path="/permissions" element={<PermissionPage />} />
-          <Route path="/centers" element={<CentersPage />} />
-          <Route path="/members" element={<MembersPage />} />
-          <Route path="/members/:id" element={<MemberViewPage />} />
-         </Route>
+          </Route>
+          <Route element={<ProtectedRoute permission="view-roles" />}>
+            <Route path="/roles" element={<RolePage />} />
+          </Route>
+         
+          <Route element={<ProtectedRoute permission="view-permissions" />}>
+            <Route path="/permissions" element={<PermissionPage />} />
+          </Route>
+        
+
+           <Route element={<ProtectedRoute permission="view-centers" />}>
+            <Route path="/centers" element={<CentersPage />} />
+           </Route>
+         
+
+           <Route element={<ProtectedRoute permission="view-members" />}>
+             <Route path="/members/" element={<MembersPage key="all-members" />} />
+             </Route>
+        
+
+
+           <Route element={<ProtectedRoute permission="view-centers" />}>
+          <Route path="/centers/center/:centerId" element={<MembersPage key="center-members" />} />
+
+           </Route>
+
+
+            <Route element={<ProtectedRoute permission="view-members" />}>
+             <Route path="/members/:id" element={<MemberViewPage />} />
+            </Route>
+
+             <Route path="/unauthorized" element={<UnauthorizesPage />} />
+         
+           <Route path="*" element={<NotFoundPage />} />
+
               </Routes>
     </BrowserRouter>
     

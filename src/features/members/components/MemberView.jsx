@@ -4,12 +4,11 @@ import { useDispatch, useSelector } from "react-redux";
 import Navbar from "../../dashboard/Navbar";
 import { fetchSingleMember } from "../memberSlice";
 import { fetchUpdateEmi, setEmiUpdated } from "../../emis/emisSlice";
-import { MySwal } from "../../../utils/alert";
+import { can, MySwal } from "../../../utils/alert";
 
 export default function MemberView() {
   const { id } = useParams();
   const dispatch = useDispatch();
-  const token = sessionStorage.getItem("auth_token");
 
   const { member,emis, loading } = useSelector((state) => state.member);
   const isEmiUpdated = useSelector((state) => state.emi.isEmiUpdated);
@@ -21,8 +20,8 @@ export default function MemberView() {
 
 
   useEffect(() => {
-    dispatch(fetchSingleMember({ token, id }));
-  }, [dispatch, token, id]);
+    dispatch(fetchSingleMember({ id }));
+  }, [dispatch, id]);
 
   useEffect(() => {
     
@@ -53,7 +52,7 @@ export default function MemberView() {
             timer: 3000,
           });
 
-        dispatch(fetchSingleMember({ token, id }));
+        dispatch(fetchSingleMember({ id }));
         dispatch(setEmiUpdated());
         }
     
@@ -84,7 +83,7 @@ export default function MemberView() {
   // 🔁 ACTION HANDLERS (API CALLS CAN BE PLUGGED HERE)
   const updateEmis = (id , paid_amount , remain_amount ,type) => {
     setProcessingBtn(`${id}-${type}`);
-   dispatch(fetchUpdateEmi({ token, emiData: {id , paid_amount , remain_amount} }));
+   dispatch(fetchUpdateEmi({ emiData: {id , paid_amount , remain_amount} }));
   };
 
 
@@ -139,7 +138,7 @@ export default function MemberView() {
           <th className="px-6 py-4 text-left">Paid</th>
           <th className="px-6 py-4 text-left">Remaining</th>
           <th className="px-6 py-4 text-left">Status</th>
-          <th className="px-6 py-4 text-center">Action</th>
+        {  can('update-emi-status')  &&  <th className="px-6 py-4 text-center">Action</th> }
         </tr>
       </thead>
 
@@ -256,7 +255,7 @@ export default function MemberView() {
 
 
                 {/* Actions */}
-        <td className="px-6 py-6 text-center">
+   {  can('update-emi-status')  && <td className="px-6 py-6 text-center">
           <div className="flex justify-center gap-3">
 
             {/* Partial */}
@@ -304,7 +303,7 @@ export default function MemberView() {
             </button>
 
           </div>
-        </td>
+        </td>}
 
 
               </tr>

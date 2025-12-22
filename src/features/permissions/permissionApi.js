@@ -1,63 +1,62 @@
 import config from "../../config";
+import { apiFetch } from "../../utils/basicApi";
 
 
-export function deletePermission({token ,Id}) {
-  return new Promise(async (resolve ,reject) => {
-    const response = await fetch(`${config.USER_SERVICE_BASE_URL}/permissions/${Id}`, {
-      method: 'DELETE',
-      headers: { 'content-type': 'application/json'  , 'Authorization': 'Bearer '+token },
-    });
-    const data = await response.json();
-    data.success ? resolve({ data }) : reject({ message:data.message });
-  });
-}
 
-export function getAllPermissions({ token, page = 1 }) {
-  return new Promise(async (resolve ,reject) => {
-    const response = await fetch(`${config.USER_SERVICE_BASE_URL}/permissions?page=${page}`,{
-      method: 'GET',
-      headers: { 'content-type': 'application/json' , 'Authorization': 'Bearer '+token },
-    });
-    const data = await response.json();
-    data.success ? resolve({ data }) : reject({ message:data.message });
-  });
-}
-
-export function create({token , pData}) {
-  return new Promise(async (resolve ,reject) => {
-    const response = await fetch(`${config.USER_SERVICE_BASE_URL}/permissions`,{
-      method: 'POST',
-      body: JSON.stringify(pData),
-      headers: { 'content-type': 'application/json' , 'Authorization': 'Bearer '+token },
-    });
-    const data = await response.json();
-    data.success ? resolve({ data }) : reject({ message:data.message });
-  });
+function successOrThrow(data) {
+  if (!data?.success) {
+    throw new Error(data?.message || "Operation failed");
+  }
+  return { data };
 }
 
 
-export function update({token , pData}) {
-  return new Promise(async (resolve ,reject) => {
-    const response = await fetch(`${config.USER_SERVICE_BASE_URL}/permissions/${pData.id}`,{
-      method: 'PUT',
-      body: JSON.stringify(pData),
-      headers: { 'content-type': 'application/json' , 'Authorization': 'Bearer '+token },
-    });
-    const data = await response.json();
-    data.success ? resolve({ data }) : reject({ message:data.message });
+export async function deletePermission({ id }) {
+  if (!id) throw new Error("Permission ID is required for delete");
+
+  const data = await apiFetch(
+    `${config.USER_SERVICE_BASE_URL}/permissions/${id}`,
+    { method: "DELETE" }
+  );
+  return successOrThrow(data);
+}
+
+export async function getAllPermissions({ page = 1 }) {
+  const data = await apiFetch(
+    `${config.USER_SERVICE_BASE_URL}/permissions?page=${page}`,
+    { method: "GET" }
+  );
+  return successOrThrow(data);
+}
+
+export async function create({ pData }) {
+  const data = await apiFetch(`${config.USER_SERVICE_BASE_URL}/permissions`, {
+    method: "POST",
+    body: pData,
   });
+  return successOrThrow(data);
 }
 
 
-export function getAllGroupedPermissions(token) {
-  return new Promise(async (resolve ,reject) => {
-    const response = await fetch(`${config.USER_SERVICE_BASE_URL}/permissions-grouped`,{
-      method: 'GET',
-      headers: { 'content-type': 'application/json' , 'Authorization': 'Bearer '+token },
-    });
-    const data = await response.json();
-    data.success ? resolve({ data }) : reject({ message:data.message });
-  });
+export async function update({ pData }) {
+  if (!pData.id) throw new Error("Permission ID is required for update");
+
+  const data = await apiFetch(
+    `${config.USER_SERVICE_BASE_URL}/permissions/${pData.id}`,
+    {
+      method: "PUT",
+      body: pData,
+    }
+  );
+  return successOrThrow(data);
 }
 
+
+export async function getAllGroupedPermissions() {
+  const data = await apiFetch(
+    `${config.USER_SERVICE_BASE_URL}/permissions-grouped`,
+    { method: "GET" }
+  );
+  return successOrThrow(data);
+}
 

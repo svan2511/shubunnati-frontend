@@ -3,8 +3,8 @@ import { getDashboardData, update } from './emisApi';
 
 export const fetchUpdateEmi = createAsyncThunk(
   'emi/update',
-  async ({ token,emiData }) => {
-    const response = await update({token , emiData});
+  async ({ emiData }) => {
+    const response = await update({ emiData});
     // The value we return becomes the `fulfilled` action payload
     return response.data;
   }
@@ -12,8 +12,8 @@ export const fetchUpdateEmi = createAsyncThunk(
 
 export const fetchDashboardData = createAsyncThunk(
   'dashboard/getDashdata',
-  async ({ token,filterData }) => {
-    const response = await getDashboardData({token , filterData});
+  async ({ filterData }) => {
+    const response = await getDashboardData({ filterData});
     // The value we return becomes the `fulfilled` action payload
     return response.data;
   }

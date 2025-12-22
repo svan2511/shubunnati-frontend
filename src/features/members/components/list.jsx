@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
 import Navbar from "../../dashboard/Navbar";
-import { MySwal, formatTitle , getBgColor , getInitials } from "../../../utils/alert";
+import { MySwal, can, formatTitle , getBgColor , getInitials } from "../../../utils/alert";
 import {
   fetchAllMembers,
   fetchCreateMember,
@@ -15,12 +15,13 @@ import {
 import { uploadToCloudinary } from "../../../utils/cloudinaryUpload";
 import { fetchAllCenters } from "../../centers/centerSlice";
 import { calculateInstallment } from "../../../utils/calculateInstallment";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 export default function List() {
   const dispatch = useDispatch();
-  const token = sessionStorage.getItem("auth_token");
   const navigate = useNavigate();
+   const { centerId } = useParams();
+   const findCenter = centerId ?? "ALL";
 
   const { isMemberCreate, members, currentPage, totalPages, loading ,isSubmitting } = useSelector((state) => state.member);
   const centers = useSelector((state) => state.center.centers);
@@ -32,6 +33,8 @@ export default function List() {
   const [imagePreview, setImagePreview] = useState("");
   const [imgPreviewError, setImgPreviewError] = useState(false); // modal preview error
   const [imgErrors, setImgErrors] = useState({}); // table per-member image error
+  const [searchTerm, setSearchTerm] = useState("");
+
 
   const { register, handleSubmit, reset, setValue, watch, formState: { errors } } = useForm({
     defaultValues: {
@@ -50,10 +53,23 @@ export default function List() {
   const disbAmount = watch("disb_amount");
   const tenor = watch("mem_tenor");
 
+  const filteredMembers = members.filter((member) => {
+  if (!searchTerm) return true;
+
+  const term = searchTerm.toLowerCase();
+
+  return (
+    member.mem_name?.toLowerCase().includes(term) ||
+    member.mem_phone?.toLowerCase().includes(term)
+  );
+});
+
+
   useEffect(() => {
-    dispatch(fetchAllMembers({ token, page: currentPage }));
-    dispatch(fetchAllCenters({ token, page: "ALL" }));
-  }, [dispatch, token, currentPage]);
+
+    dispatch(fetchAllMembers({ page: currentPage , centerId:findCenter }));
+    dispatch(fetchAllCenters({ page: "ALL" }));
+  }, [dispatch, currentPage]);
 
   useEffect(() => {
     if (disbAmount && tenor) {
@@ -85,7 +101,7 @@ export default function List() {
       });
 
       if (isMemberCreate !== "error") {
-        dispatch(fetchAllMembers({ token, page: currentPage }));
+        dispatch(fetchAllMembers({ page: currentPage , centerId:findCenter }));
         dispatch(setUpdateStatus());
         closeModal();
       }
@@ -153,9 +169,9 @@ export default function List() {
 
   const onSubmit = (formData) => {
     if (modalMode === "create") {
-      dispatch(fetchCreateMember({ token, mData: formData }));
+      dispatch(fetchCreateMember({ mData: formData }));
     } else if (modalMode === "edit") {
-      dispatch(fetchUpdateMember({ token, mData: formData }));
+      dispatch(fetchUpdateMember({ mData: formData }));
     }
   };
 
@@ -173,7 +189,7 @@ export default function List() {
         cancelButton: "px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 mx-2",
       },
     }).then((res) => {
-      if (res.isConfirmed) dispatch(fetchDeleteMember({ token, Id }));
+      if (res.isConfirmed) dispatch(fetchDeleteMember({ Id }));
     });
   };
 
@@ -198,18 +214,31 @@ export default function List() {
       )}
 
       <div className="max-w-7xl mx-auto p-6">
-        <div className="flex justify-between mb-6">
-          <h1 className="text-2xl font-bold">Members</h1>
-          <button
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+        <h1 className="text-2xl font-bold">Members</h1>
+
+        <div className="flex gap-3 w-full md:w-auto">
+          <input
+            type="text"
+            placeholder="Search by name or phone..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full md:w-72 px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg
+                      text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+
+       { can('create-members') &&  <button
             onClick={openCreateModal}
-            className="px-4 py-2 bg-indigo-600 rounded hover:bg-indigo-700"
+            className="px-4 py-2 bg-indigo-600 rounded hover:bg-indigo-700 whitespace-nowrap"
           >
             + Add Member
-          </button>
+          </button>}
         </div>
+      </div>
+
 
         {/* Table */}
-        <div className="overflow-x-auto rounded-xl border border-white/10">
+        <div className="overflow-x-auto rounded-xl border border-white/10 mt-10">
           <table className="min-w-full text-sm text-center">
             <thead className="bg-white/10 text-gray-300 uppercase text-xs">
               <tr>
@@ -229,7 +258,7 @@ export default function List() {
                   </td>
                 </tr>
               ) : (
-                members.map((member, index) => (
+                filteredMembers.map((member, index) => (
                   <tr key={member.id} className="border-t border-white/10">
                     <td className="px-4 py-3 text-center">{(currentPage - 1) * 10 + index + 1}</td>
                     <td className="px-4 py-3 text-center">{formatTitle(member.mem_name)}</td>
@@ -261,24 +290,24 @@ export default function List() {
                     <td className="px-4 py-3 text-center">{member.disb_amount}</td>
                     <td className="px-4 py-3 text-center">
                       <div className="flex justify-center gap-2">
-                        <button
+                      { can('view-members') && <button
                         onClick={() => navigate(`/members/${member.id}`)}
                           className="px-3 py-1 bg-yellow-500 text-black rounded"
                         >
                           View
-                        </button>
-                        <button
+                        </button>}
+                      { can('edit-members') && <button
                           onClick={() => openEditModal(member)}
                           className="px-3 py-1 bg-yellow-500 text-black rounded"
                         >
                           Edit
-                        </button>
-                        <button
+                        </button>}
+                       { can('delete-members') && <button
                           onClick={() => handleDelete(member.id)}
                           className="px-3 py-1 bg-red-600 rounded"
                         >
                           Delete
-                        </button>
+                        </button>}
                       </div>
                     </td>
                   </tr>

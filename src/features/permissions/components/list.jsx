@@ -26,7 +26,6 @@ export default function List() {
     isPermissionCreate,permissions,currentPage,totalPages,loading,isSubmitting
   } = useSelector((state) => state.permission);
 
-  const roles = useSelector((state) => state.role.roles);
 
   /* ================= Modal State ================= */
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -49,9 +48,9 @@ export default function List() {
 
   /* ================= Fetch ================= */
   useEffect(() => {
-    dispatch(fetchAllPermissions({ token, page: currentPage }));
+    dispatch(fetchAllPermissions({  page: currentPage }));
     // dispatch(fetchAllRoles(token));
-  }, [dispatch, token, currentPage]);
+  }, [dispatch, currentPage]);
 
   /* ================= Toast ================= */
   useEffect(() => {
@@ -90,7 +89,7 @@ export default function List() {
           });
 
           if(isPermissionCreate !== "error") {
-          dispatch(fetchAllPermissions({ token, page: currentPage }));
+          dispatch(fetchAllPermissions({ page: currentPage }));
           dispatch(setUpdateStatus());
           closeModal();
           }
@@ -138,10 +137,10 @@ export default function List() {
     
     if (modalMode === "create") {
    
-      dispatch(fetchCreatePermission({ token, pData: formData }));
+      dispatch(fetchCreatePermission({  pData: formData }));
     }
      if (modalMode === "edit") {
-      dispatch(fetchUpdatePermission({ token, pData: formData }));
+      dispatch(fetchUpdatePermission({ pData: formData }));
     }
   };
 
@@ -163,7 +162,7 @@ export default function List() {
       },
     }).then((res) => {
       if (res.isConfirmed) {
-        dispatch(fetchDeletePermission({token , Id}));
+        dispatch(fetchDeletePermission({ Id}));
       }
     });
   };

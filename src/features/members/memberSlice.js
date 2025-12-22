@@ -3,8 +3,8 @@ import { create, deleteMember, getAllMembers, getSinglemember, update } from './
 
 export const fetchAllMembers = createAsyncThunk(
   'member/allMembers',
-  async ({ token, page}) => {
-    const response = await getAllMembers({ token, page });
+  async ({ page , centerId}) => {
+    const response = await getAllMembers({ page ,centerId });
     // The value we return becomes the `fulfilled` action payload
     return response.data;
   }
@@ -12,8 +12,8 @@ export const fetchAllMembers = createAsyncThunk(
 
 export const fetchSingleMember = createAsyncThunk(
   'member/singleMember',
-  async ({ token, id }) => {
-    const response = await getSinglemember({ token, id });
+  async ({ id }) => {
+    const response = await getSinglemember({ id });
     // The value we return becomes the `fulfilled` action payload
     return response.data;
   }
@@ -22,8 +22,8 @@ export const fetchSingleMember = createAsyncThunk(
 
 export const fetchCreateMember = createAsyncThunk(
   'member/create',
-  async ({ token,mData }) => {
-    const response = await create({token , mData});
+  async ({ mData }) => {
+    const response = await create({ mData});
     // The value we return becomes the `fulfilled` action payload
     return response.data;
   }
@@ -31,8 +31,8 @@ export const fetchCreateMember = createAsyncThunk(
 
 export const fetchUpdateMember = createAsyncThunk(
   'member/update',
-  async ({ token,mData }) => {
-    const response = await update({token , mData});
+  async ({ mData }) => {
+    const response = await update({ mData});
     // The value we return becomes the `fulfilled` action payload
     return response.data;
   }
@@ -40,8 +40,8 @@ export const fetchUpdateMember = createAsyncThunk(
 
 export const fetchDeleteMember = createAsyncThunk(
   'member/delete',
-  async ({ token,Id }) => {
-    const response = await deleteMember({token , Id});
+  async ({ Id }) => {
+    const response = await deleteMember({Id});
     // The value we return becomes the `fulfilled` action payload
     return response.data;
   }

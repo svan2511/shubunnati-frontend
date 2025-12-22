@@ -1,74 +1,79 @@
 import config from "../../config";
+import { apiFetch } from "../../utils/basicApi";
 
-// A mock function to mimic making an async request for data
-export function fetchLoginUser(userdata) {
-  return new Promise(async (resolve , reject) => {
-    const response = await fetch(`${config.USER_SERVICE_BASE_URL}/login`, {
-      method: 'POST',
-      body: JSON.stringify(userdata),
-      headers: { 'content-type': 'application/json' },
-    });
-    const data = await response.json();
-    data.success ? resolve({ data }) : reject({ message:data.message });
-  });
+function successOrThrow(data) {
+  if (!data?.success) {
+    throw new Error(data?.message || "Operation failed");
+  }
+  return { data };
 }
 
-// A mock function to mimic making an async request for data
-export function fetchLogoutUser(token) {
-  return new Promise(async (resolve , reject) => {
-    const response = await fetch(`${config.USER_SERVICE_BASE_URL}/logout`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' ,'Accept': 'application/json', 'Authorization': 'Bearer '+token },
-    });
-    const data = await response.json();
-    data.success ? resolve({ data }) : reject({ message:data.message });
-  });
+export async function fetchLoginUser(userdata) {
+  const data = await apiFetch(
+    `${config.USER_SERVICE_BASE_URL}/login`,
+    {
+      method: "POST",
+      body: userdata,
+    }
+  );
+
+  return successOrThrow(data);
 }
 
 
-export function deleteUser({token ,userId}) {
-  return new Promise(async (resolve ,reject) => {
-    const response = await fetch(`${config.USER_SERVICE_BASE_URL}/users/${userId}`, {
-      method: 'DELETE',
-      headers: { 'content-type': 'application/json'  , 'Authorization': 'Bearer '+token },
-    });
-    const data = await response.json();
-    data.success ? resolve({ data }) : reject({ message:data.message });
-  });
-}
+export async function fetchLogoutUser() {
+  const data = await apiFetch(
+    `${config.USER_SERVICE_BASE_URL}/logout`,
+    {
+      method: "POST",
+    }
+  );
 
-export function getAllUsers({ token, page = 1 }) {
-  return new Promise(async (resolve ,reject) => {
-    const response = await fetch(`${config.USER_SERVICE_BASE_URL}/users?page=${page}`,{
-      method: 'GET',
-      headers: { 'content-type': 'application/json' , 'Authorization': 'Bearer '+token },
-    });
-    const data = await response.json();
-    data.success ? resolve({ data }) : reject({ message:data.message });
-  });
-}
-
-export function create({token , userdata}) {
-  return new Promise(async (resolve ,reject) => {
-    const response = await fetch(`${config.USER_SERVICE_BASE_URL}/users`,{
-      method: 'POST',
-      body: JSON.stringify(userdata),
-      headers: { 'content-type': 'application/json' , 'Authorization': 'Bearer '+token },
-    });
-    const data = await response.json();
-    data.success ? resolve({ data }) : reject({ message:data.message });
-  });
+  return successOrThrow(data);
 }
 
 
-export function update({token , userdata}) {
-  return new Promise(async (resolve ,reject) => {
-    const response = await fetch(`${config.USER_SERVICE_BASE_URL}/users/${userdata.user_id}`,{
-      method: 'PUT',
-      body: JSON.stringify(userdata),
-      headers: { 'content-type': 'application/json' , 'Authorization': 'Bearer '+token },
-    });
-    const data = await response.json();
-    data.success ? resolve({ data }) : reject({ message:data.message });
-  });
+export async function deleteUser({ userId }) {
+  const data = await apiFetch(
+    `${config.USER_SERVICE_BASE_URL}/users/${userId}`,
+    {
+      method: "DELETE",
+    }
+  );
+
+  return successOrThrow(data);
+}
+
+
+export async function getAllUsers({ page = 1 }) {
+  const data = await apiFetch(
+    `${config.USER_SERVICE_BASE_URL}/users?page=${page}`
+  );
+
+  return successOrThrow(data);
+}
+
+export async function create({ userdata }) {
+  const data = await apiFetch(
+    `${config.USER_SERVICE_BASE_URL}/users`,
+    {
+      method: "POST",
+      body: userdata,
+    }
+  );
+
+  return successOrThrow(data);
+}
+
+
+export async function update({ userdata }) {
+  const data = await apiFetch(
+    `${config.USER_SERVICE_BASE_URL}/users/${userdata.user_id}`,
+    {
+      method: "PUT",
+      body: userdata,
+    }
+  );
+
+  return successOrThrow(data);
 }
